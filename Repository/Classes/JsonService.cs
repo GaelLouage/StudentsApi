@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using StudentPointsApi.Extensions;
 using StudentPointsApi.Models;
 using StudentPointsApi.Repository.Interfaces;
 
@@ -7,7 +9,7 @@ namespace StudentPointsApi.Repository.Classes
     public class JsonService : IJsonService
     {
         private const string FILE_NAME = "Students.json";
-        private string _filePath;
+        private string? _filePath;
         private List<Student> _students = new List<Student>();
 
         public async Task<List<Student>> GetAllAsync()
@@ -15,52 +17,37 @@ namespace StudentPointsApi.Repository.Classes
             await ReadJsonFile();
             return _students;
         }
-        public async Task AddStudentAsync(Student student)
+        public async Task<Student> GetStudentByFullNameAsync(string firstName, string lastName)
         {
-
-           await ReadJsonFile();
-
-            var studentToCheck = _students.FirstOrDefault(x => x.FirstName == student.FirstName && x.LastName == student.LastName);
-            if (studentToCheck is  null)
+            await ReadJsonFile();
+            return _students.GetStudentToCheck(firstName, lastName);
+        }
+        public async Task<bool> DeleteStudentAsync(string firstName, string lastName)
+        {
+            return await StudentActionAsync(firstName, lastName,
+            (student) =>
             {
+                _students.Remove(student);
+            });
+        }
+
+        public async Task<bool> AddStudentAsync(Student student)
+        {
+            return await StudentActionAsync(student.FirstName, student.LastName,
+            (s) =>
+            {
+                _students.Remove(s);
                 _students.Add(student);
-                var converter = JsonConvert.SerializeObject(_students);
-             
-               await File.WriteAllTextAsync(FILE_NAME, converter);
-            }
+            });
         }
-
-        public async Task DeleteStudentAsync(string firstName, string lastName)
+        public async Task<bool> UpdateStudentAsync(string firstName, string lastName, Student student)
         {
-            
-            await ReadJsonFile();
-            var studentToCheck = _students.FirstOrDefault(x => x.FirstName == firstName && x.LastName == lastName);
-            if (studentToCheck is not null)
+            return await StudentActionAsync(firstName, lastName,
+            (s) =>
             {
-                _students.Remove(studentToCheck);
-                var converter = JsonConvert.SerializeObject(_students);
-
-                await File.WriteAllTextAsync(FILE_NAME, converter);
-            }
-        }
-        public async Task<Student>? GetStudentByFullNameAsync(string firstName, string lastName)
-        {
-            await ReadJsonFile();
-            return _students.FirstOrDefault(x => x.FirstName == firstName && x.LastName == lastName);
-        }
-
-        public async Task UpdateStudentAsync(string firstName, string lastName, Student student)
-        {
-            await ReadJsonFile();
-            var studentToCheck = _students.FirstOrDefault(x => x.FirstName == firstName && x.LastName == lastName);
-            if (studentToCheck is not null)
-            {
-                _students.Remove(studentToCheck);
+                _students.Remove(s);
                 _students.Add(student);
-                var converter = JsonConvert.SerializeObject(_students);
-
-                await File.WriteAllTextAsync(FILE_NAME, converter);
-            }
+            });
         }
 
         private async Task ReadJsonFile()
@@ -69,6 +56,21 @@ namespace StudentPointsApi.Repository.Classes
             _filePath = Path.Combine(currentFolder, FILE_NAME);
             var jsonData = await File.ReadAllTextAsync(FILE_NAME);
             _students = JsonConvert.DeserializeObject<List<Student>>(jsonData);
+        }
+
+        private async Task<bool> StudentActionAsync(string firstName, string lastName, Action<Student> action)
+        {
+            await ReadJsonFile();
+            var studentToCheck = _students.GetStudentToCheck(firstName, lastName);
+            if (studentToCheck is not null)
+            {
+                action(studentToCheck);
+                var converter = JsonConvert.SerializeObject(_students);
+
+                await File.WriteAllTextAsync(FILE_NAME, converter);
+                return true;
+            }
+            return false;
         }
     }
 }

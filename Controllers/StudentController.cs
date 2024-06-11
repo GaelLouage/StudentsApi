@@ -34,24 +34,35 @@ namespace StudentPointsApi.Controllers
         [HttpPost("AddStudent")]
         public async Task<IActionResult> AddStudent(Student student)
         {
-            await JsonService.AddStudentAsync(student);
-            
-            return Ok("Student added");
+            var addStudent = await JsonService.AddStudentAsync(student);
+            if (addStudent)
+            {
+                return Ok("Student added.");
+            }
+            return BadRequest("Student already exists!");
+
         }
         [HttpPost("DeleteStudent/{firstName}")]
         public async Task<IActionResult> DeleteStudent(string firstName, string lastName)
         {
-            await JsonService.DeleteStudentAsync(firstName,lastName);
-
-            return Ok("Student deleted!");
+            var deleteStudent = await JsonService.DeleteStudentAsync(firstName,lastName);
+            if (deleteStudent)
+            {
+                return Ok("Student deleted.");
+            }
+            return BadRequest("Failed to delete!");
         }
 
         [HttpPut("UpdateStudent/{firstName}/{lastName}")]
         public async Task<IActionResult> UpdateStudent(string firstName, string lastName, Student student)
         {
-            await JsonService.UpdateStudentAsync(firstName, lastName, student);
+            var updateStudent = await JsonService.UpdateStudentAsync(firstName, lastName, student);
+            if (updateStudent)
+            {
+                return Ok("Student Updated!");
+            }
 
-            return Ok("Student Updated!");
+            return BadRequest("Failed to update student!");
         }
     }
 }

@@ -6,8 +6,8 @@ namespace StudentPointsApi.Repository.Interfaces
     {
         Task<List<Student>> GetAllAsync();
         Task<Student> GetStudentByFullNameAsync(string firstName, string lastName);
-        Task UpdateStudentAsync(string firstName, string lastName,Student student);
-        Task AddStudentAsync(Student student);
-        Task DeleteStudentAsync(string firstName, string LastName);
+        Task<bool> UpdateStudentAsync(string firstName, string lastName,Student student);
+        Task<bool> AddStudentAsync(Student student);
+        Task<bool> DeleteStudentAsync(string firstName, string LastName);
     }
 }

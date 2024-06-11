@@ -32,3 +32,4 @@ C:\Users\louag\source\repos\PriceComparer\StudentPointsApi\StudentPointsApi\obj\
 C:\Users\louag\source\repos\PriceComparer\StudentPointsApi\StudentPointsApi\obj\Debug\net8.0\ref\StudentPointsApi.dll
 C:\Users\louag\source\repos\PriceComparer\StudentPointsApi\StudentPointsApi\bin\Debug\net8.0\Newtonsoft.Json.dll
 C:\Users\louag\source\repos\PriceComparer\StudentPointsApi\StudentPointsApi\bin\Debug\net8.0\Students.json
+C:\Users\louag\source\repos\PriceComparer\StudentPointsApi\StudentPointsApi\obj\Debug\net8.0\StudentPointsApi.sourcelink.json
